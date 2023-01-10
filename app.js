@@ -1,12 +1,11 @@
 import express from 'express'
 import morgan from 'morgan'
-//import routers here
-
+import { gamesRouter } from './routes/games.js'
 const app = express()
 
 app.use(morgan('dev'))
 app.use(express.json())
-// app.use('/api/bootcampers', bootcampersRouter)
+app.use('/api/games', gamesRouter)
 // app.use('/api/posts', postsRouter)
 // app.use('/api/comments', commentsRouter)
 
