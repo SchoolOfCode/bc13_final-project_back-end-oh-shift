@@ -8,13 +8,6 @@ export async function getAllGames() {
   return games
 }
 
-// export async function getBootcamperByID (id) {
-//   const data = await pool.query(
-//     'SELECT * FROM bootcampers WHERE id = $1',
-//     [id]
-//   )
-//   return data.rows[0]
-// }
 
 export async function createGame (newGame) {
   const data = await pool.query(
@@ -23,19 +16,23 @@ export async function createGame (newGame) {
   return data.rows[0]
   }
 
-  
-// export async function updateBootcamper (id, updatedBootcamper) {
-//   const data = await pool.query(
-//     'UPDATE bootcampers SET username = $1, is_coach = $2 WHERE id = $3 RETURNING *;',
-//     [updatedBootcamper.username, updatedBootcamper.is_coach, id]
-//   )
-//   return data.rows[0]
-// }
+export async function getGamesByFilter (difficulty, number_of_players, age, duration, genre) {
 
-// export async function deleteBootcamper (id) {
-//   const data = await pool.query(
-//     'DELETE FROM bootcampers WHERE id = $1 RETURNING *;',
-//     [id]
-//   )
-//   return data.rows[0]
-// }
+//specify base of sql statement
+let sqlQuery = `SELECT * FROM games `;
+
+//check to see if any filter criteria is present in url request, if so, add 'where' to sql statement
+if (difficulty || number_of_players || age || duration || genre) {
+  sqlQuery += `WHERE `;
+  console.log('sql query: ', sqlQuery)
+}
+
+//add to sql statement based on filter options: difficulty
+if (difficulty) {
+  sqlQuery += `difficulty = $1`
+  console.log('sql query: ', sqlQuery)
+}
+const result = await pool.query(sqlQuery, [difficulty])
+const games = result.rows
+return games
+}
