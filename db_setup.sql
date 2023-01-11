@@ -32,8 +32,7 @@ INSERT INTO games (
   description, 
   packaging_image_url, 
   artwork_image_url, 
-  rules, 
-  skus, 
+  rules,  
   barcode, 
   location, 
   video_rules)
