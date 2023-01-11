@@ -12,15 +12,6 @@ gamesRouter.get('/', async function (req, res) {
   })
 })
 
-// gamesRouter.get('/:id', async function (req, res) {
-//   const id = Number(req.params.id)
-//   const bootcamper = await gamesModel.getBootcamperByID(id)
-
-//   res.status(200).json({
-//     success: true,
-//     payload: bootcamper
-//   })
-// })
 
 gamesRouter.post('/', async function (req, res) {
   console.log(req.body)
@@ -29,15 +20,17 @@ gamesRouter.post('/', async function (req, res) {
   res.status(201).json({ success: true, payload: result })
 })
 
-// gamesRouter.patch('/:id', async function (req, res) {
-//   const id = Number(req.params.id)
-//   const data = req.body
-//   const result = await gamesModel.updateBootcamper(id, data)
-//   res.json({ success: true, payload: result })
-// })
-
-// gamesRouter.delete('/:id', async function (req, res) {
-//   const id = Number(req.params.id)
-//   const result = await gamesModel.deleteBootcamper(id)
-//   res.json({ success: true, payload: result })
-// })
+//ultimate filter that adds filter conditions (difficulty, number_of_players, age, duration, genre)
+gamesRouter.get("/filter", async function (req, res) {
+  const difficulty = req.query.difficulty;
+  console.log('console log difficulty', difficulty)
+  const number_of_players = req.query.number_of_players;
+  const age = req.query.age;
+  const duration = req.query.duration;
+  const genre = req.query.genre;
+  const games = await gamesModel.getGamesByFilter(difficulty, number_of_players, age, duration, genre);
+  res.status(200).json({
+    success: true,
+    payload: games
+  })
+});
