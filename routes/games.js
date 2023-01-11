@@ -3,14 +3,14 @@ import * as gamesModel from '../models/games.js'
 
 export const gamesRouter = express.Router()
 
-gamesRouter.get('/', async function (req, res) {
-  const games = await gamesModel.getAllGames()
+// gamesRouter.get('/', async function (req, res) {
+//   const games = await gamesModel.getAllGames()
 
-  res.status(200).json({
-    success: true,
-    payload: games
-  })
-})
+//   res.status(200).json({
+//     success: true,
+//     payload: games
+//   })
+// })
 
 gamesRouter.post('/', async function (req, res) {
   console.log(req.body)
@@ -20,7 +20,7 @@ gamesRouter.post('/', async function (req, res) {
 })
 
 // ultimate filter that adds filter conditions (difficulty, number_of_players, age, duration, genre)
-gamesRouter.get('/filter', async function (req, res) {
+gamesRouter.get('/', async function (req, res) {
   const difficulty = req.query.difficulty
   console.log('console log difficulty', difficulty)
   const number_of_players = req.query.number_of_players
