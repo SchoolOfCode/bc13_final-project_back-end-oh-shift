@@ -77,24 +77,23 @@ export async function getGamesByFilter(
 
   // add to sql statement based on filter options: duration
   if (duration) {
-    console.log('DURATION IF STATEMENT REACHED')
+    console.log('DURATION =', duration)
     let durationQuery = [];
     let userDuration = [];
     userDuration.push(duration)
+    console.log('userDuration', userDuration)
 
-    for (let i = 0; i <= userDuration.length; i++) {
+
+    for (let i = 0; i <= duration.length; i++) {
       if (duration[i] == '30' || userDuration[i] == '30') {
-        console.log('USER DURATION[I] == 30')
         sqlParams.push(30);
         durationQuery.push(`duration <= $${sqlParams.indexOf(30) + 1}`);
       }
       if (duration[i] == '60' || userDuration[i] == '60') {
-        console.log('USER DURATION[I] == 60')
         sqlParams.push(29, 89);
         durationQuery.push(`duration BETWEEN $${sqlParams.indexOf(29) + 1} AND $${sqlParams.indexOf(89) + 1}`);
       }
       if (duration[i] == '90' || userDuration[i] == '90') {
-        console.log('USER DURATION[I] == 90')
         sqlParams.push(90);
         durationQuery.push(`duration >= $${sqlParams.indexOf(90) + 1}`);
       }
@@ -109,7 +108,7 @@ export async function getGamesByFilter(
 
     console.log('duration query', durationQuery)
     let joinedDurationQuery = durationQuery.join(" OR ")
-    if ( difficulty || number_of_players || age || genre ) {
+    if ( age && (difficulty || number_of_players || genre) ) {
       joinedDurationQuery= joinedDurationQuery+')';
     }
   
@@ -118,6 +117,10 @@ export async function getGamesByFilter(
     sqlQuery += `${joinedDurationQuery} `;
     // console.log(sqlQuery)
     // console.log('sql query: ', sqlQuery)
+
+    if ( age ) {
+      sqlQuery += " AND duration IN (SELECT duration FROM games WHERE ";
+    }
   }
 
   // add to sql statement based on filter options: age
@@ -126,37 +129,38 @@ export async function getGamesByFilter(
     let ageQuery = [];
     let userAge = [];
     userAge.push(age)
+    console.log('userAge', userAge, userAge.length)
+    console.log('age', age, age.length)
+  
 
-    for (let i = 0; i < userAge.length; i++) {
-      if (userAge[i] == 10) {
+    for (let i = 0; i < age.length; i++) {
+      if (age[i] == '10' || userAge[i] == '10') {
         sqlParams.push(10);
         ageQuery.push(`minimum_age <= $${sqlParams.indexOf(10) + 1}`);
       }
-      if (userAge[i] == 12) {
+      if (age[i] == '12' || userAge[i] == '12') {
         sqlParams.push(10, 12);
-        ageQuery.push(
-          `minimum_age BETWEEN $${sqlParams.indexOf(10) + 1} AND $${sqlParams.indexOf(12) + 1}`
+        ageQuery.push(`minimum_age BETWEEN $${sqlParams.indexOf(10) + 1} AND $${sqlParams.indexOf(12) + 1}`
         );
       }
-      if (userAge[i] == 17) {
+      if (age[i] == '17' || userAge[i] == '17') {
         sqlParams.push(13, 17);
-        ageQuery.push(
-          `minimum_age BETWEEN $${sqlParams.indexOf(13) + 1} AND $${sqlParams.indexOf(17) + 1}`
+        ageQuery.push(`minimum_age BETWEEN $${sqlParams.indexOf(13) + 1} AND $${sqlParams.indexOf(17) + 1}`
         );
       }
-      if (userAge[i] == 18) {
+      if (age[i] == '18' || userAge[i] == '18') {
         sqlParams.push(18);
         ageQuery.push(`minimum_age >= $${sqlParams.indexOf(18) + 1}`);
       }
-      if (userAge[i] == 0) {
-        sqlParams.push(0, 100);
+      if (age[i] == 'any' || userAge[i] == 'any') {
+        sqlParams.push(1);
         ageQuery.push(
-          `minimum_age BETWEEN $${sqlParams.indexOf(0) + 1} AND $${sqlParams.indexOf(100) + 1}`
+          `minimum_age > $${sqlParams.indexOf(1) + 1}`
         );
       }
     }
 
-    // console.log(ageQuery)
+    console.log('ageQuery', ageQuery)
     let joinedAgeQuery = ageQuery.join(" OR ")
 
     if ( difficulty || number_of_players || duration || genre) {
@@ -167,7 +171,7 @@ export async function getGamesByFilter(
 
 
     sqlQuery += `${joinedAgeQuery} `;
-    console.log(joinedAgeQuery)
+    console.log('joinedAgeQuery', joinedAgeQuery)
 
     // console.log(sqlQuery)
     // console.log('sql query: ', sqlQuery)
