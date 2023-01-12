@@ -49,7 +49,7 @@ export async function getGamesByFilter(
     sqlQuery += `difficulty = $${sqlParams.indexOf(difficulty) + 1}`;
     // console.log('sql query: ', sqlQuery)
     if (number_of_players || age || duration || genre) {
-      sqlQuery += " AND ";
+      sqlQuery += " AND difficulty IN (SELECT difficulty FROM games WHERE ";
     }
   }
 
@@ -61,24 +61,26 @@ export async function getGamesByFilter(
     } AND minimum_players <= $${sqlParams.indexOf(number_of_players) + 1}`;
     // console.log('sql query: ', sqlQuery)
     if (age || duration || genre) {
-      sqlQuery += " AND ";
+      sqlQuery += " AND number_of_players IN (SELECT number_of_players FROM games WHERE ";
     }
   }
 
   // add to sql statement based on filter options: genre
   if (genre) {
+  
+
     sqlParams.push(genre);
     sqlQuery += `$${sqlParams.indexOf(genre) + 1} = ANY(genre) `;
     // console.log('sql query: ', sqlQuery)
     if (duration || age) {
-      sqlQuery += " AND ";
+      sqlQuery += " AND genre IN (SELECT genre FROM games WHERE ";
     }
   }
 
 //**TODO**//
   // add to sql statement based on filter options: duration
-  //NEED TO FIND OUT DURATION TIME PERIODS TO CALCULATE RELEVANT RESULTS
-  //**TODO**//
+  // NEED TO FIND OUT DURATION TIME PERIODS TO CALCULATE RELEVANT RESULTS
+  // **TODO**//
 
   // add to sql statement based on filter options: age
   if (age) {
@@ -90,15 +92,15 @@ export async function getGamesByFilter(
         ageQuery.push(`minimum_age <= $${sqlParams.indexOf(10) + 1}`);
       }
       if (age[i] == 12) {
-        sqlParams.push("10 AND 12");
+        sqlParams.push(10, 12);
         ageQuery.push(
-          `minimum_age BETWEEN $${sqlParams.indexOf("10 AND 12") + 1}`
+          `minimum_age BETWEEN $${sqlParams.indexOf(10) + 1} AND $${sqlParams.indexOf(12) + 1}`
         );
       }
       if (age[i] == 17) {
-        sqlParams.push("13 AND 17");
+        sqlParams.push(13, 17);
         ageQuery.push(
-          `minimum_age BETWEEN $${sqlParams.indexOf("13 AND 17") + 1}`
+          `minimum_age BETWEEN $${sqlParams.indexOf(13) + 1} AND $${sqlParams.indexOf(17) + 1}`
         );
       }
       if (age[i] == 18) {
@@ -106,15 +108,20 @@ export async function getGamesByFilter(
         ageQuery.push(`minimum_age >= $${sqlParams.indexOf(18) + 1}`);
       }
       if (age[i] == 0) {
-        sqlParams.push("0 AND 100");
+        sqlParams.push(0, 100);
         ageQuery.push(
-          `minimum_age BETWEEN $${sqlParams.indexOf("0 AND 100") + 1}`
+          `minimum_age BETWEEN $${sqlParams.indexOf(0) + 1} AND $${sqlParams.indexOf(100) + 1}`
         );
       }
     }
 
     // console.log(ageQuery)
-    let joinedAgeQuery = ageQuery.join(" OR ");
+    let joinedAgeQuery = ageQuery.join(" OR ")
+    if ( difficulty || number_of_players || duration || genre) {
+      
+      joinedAgeQuery= joinedAgeQuery+')';
+    }
+  
     // console.log(joinedAgeQuery)
 
     // sqlParams.push(age)

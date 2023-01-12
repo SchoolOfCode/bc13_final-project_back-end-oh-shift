@@ -14,9 +14,9 @@ gamesRouter.post('/', async function (req, res) {
 gamesRouter.get('/', async function (req, res) {
   const difficulty = req.query.difficulty
   const number_of_players = req.query.number_of_players
-  const age = req.query.age
   const duration = req.query.duration
   const genre = req.query.genre
+  const age = req.query.age
 
   console.log('age param', age)
 
