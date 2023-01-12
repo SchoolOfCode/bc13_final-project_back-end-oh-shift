@@ -34,6 +34,7 @@ export async function getGamesByFilter(
   genre
 ) {
   // specify base of sql statement
+  let paramCount = 0
   const sqlParams = [];
   let sqlQuery = "SELECT * FROM games ";
 
@@ -45,6 +46,7 @@ export async function getGamesByFilter(
 
   // add to sql statement based on filter options: difficulty
   if (difficulty) {
+    paramCount ++;
     sqlParams.push(difficulty);
     sqlQuery += `difficulty = $${sqlParams.indexOf(difficulty) + 1}`;
     // console.log('sql query: ', sqlQuery)
@@ -55,18 +57,20 @@ export async function getGamesByFilter(
 
   // add to sql statement based on filter options: number_of_players
   if (number_of_players) {
+    paramCount ++;
     sqlParams.push(number_of_players);
     sqlQuery += `maximum_players >= $${
       sqlParams.indexOf(number_of_players) + 1
     } AND minimum_players <= $${sqlParams.indexOf(number_of_players) + 1}`;
     // console.log('sql query: ', sqlQuery)
     if (age || duration || genre) {
-      sqlQuery += " AND number_of_players IN (SELECT number_of_players FROM games WHERE ";
+      sqlQuery += " AND minimum_players IN (SELECT minimum_players FROM games WHERE ";
     }
   }
 
   // add to sql statement based on filter options: genre
   if (genre) {
+    paramCount ++;
     sqlParams.push(genre);
     sqlQuery += `$${sqlParams.indexOf(genre) + 1} = ANY(genre) `;
     // console.log('sql query: ', sqlQuery)
@@ -77,6 +81,7 @@ export async function getGamesByFilter(
 
   // add to sql statement based on filter options: duration
   if (duration) {
+    paramCount ++;
     console.log('DURATION =', duration)
     let durationQuery = [];
     let userDuration = [];
@@ -125,6 +130,7 @@ export async function getGamesByFilter(
 
   // add to sql statement based on filter options: age
   if (age) {
+    paramCount ++;
     console.log('AGE = ', age)
     let ageQuery = [];
     let userAge = [];
@@ -167,15 +173,21 @@ export async function getGamesByFilter(
       joinedAgeQuery= joinedAgeQuery+')';
     }
   
+    console.log('param count', paramCount)
     // console.log(joinedAgeQuery)
-
-
+    if (paramCount == '5') {
+      joinedAgeQuery= joinedAgeQuery+'))';
+    }
+    if (paramCount == '4') {
+      joinedAgeQuery= joinedAgeQuery+')';
+    }
     sqlQuery += `${joinedAgeQuery} `;
     console.log('joinedAgeQuery', joinedAgeQuery)
 
     // console.log(sqlQuery)
     // console.log('sql query: ', sqlQuery)
   }
+
 
   console.log(sqlParams);
   console.log(sqlQuery);
