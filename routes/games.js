@@ -18,7 +18,7 @@ gamesRouter.get('/', async function (req, res) {
   const genre = req.query.genre
   const age = req.query.age
 
-  console.log('age param', age)
+  console.log('duration param', duration)
 
   const games = await gamesModel.getGamesByFilter(difficulty, number_of_players, age, duration, genre)
   res.status(200).json({

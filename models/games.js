@@ -67,8 +67,6 @@ export async function getGamesByFilter(
 
   // add to sql statement based on filter options: genre
   if (genre) {
-  
-
     sqlParams.push(genre);
     sqlQuery += `$${sqlParams.indexOf(genre) + 1} = ANY(genre) `;
     // console.log('sql query: ', sqlQuery)
@@ -79,8 +77,50 @@ export async function getGamesByFilter(
 
 //**TODO**//
   // add to sql statement based on filter options: duration
-  // NEED TO FIND OUT DURATION TIME PERIODS TO CALCULATE RELEVANT RESULTS
-  // **TODO**//
+  if (duration) {
+    console.log('DURATION IF STATEMENT REACHED')
+    let durationQuery = [];
+    let userDuration = [];
+    userDuration.push(duration)
+
+    for (let i = 0; i <= userDuration.length; i++) {
+      console.log('HELLO LOOP')
+      console.log(duration.length)
+
+      if (userDuration[i] == 30) {
+        sqlParams.push(30);
+        durationQuery.push(`duration <= $${sqlParams.indexOf(30) + 1}`);
+      }
+      if (userDuration[i] == 60) {
+        sqlParams.push(30, 90);
+        durationQuery.push(
+          `duration BETWEEN $${sqlParams.indexOf(30) + 1} AND $${sqlParams.indexOf(90) + 1}`
+        );
+      }
+      if (userDuration[i] == 90) {
+        sqlParams.push(90);
+        durationQuery.push(`duration >= $${sqlParams.indexOf(90) + 1}`);
+      }
+      // if (duration[i] == 'any') {
+      //   sqlParams.push(0);
+      //   durationQuery.push(
+      //     `duration > $${sqlParams.indexOf(0) + 1}`
+      //   );
+      // }
+    }
+
+    console.log(durationQuery)
+    let joinedDurationQuery = durationQuery.join(" OR ")
+    if ( difficulty || number_of_players || age || genre ) {
+      joinedDurationQuery= joinedDurationQuery+')';
+    }
+  
+    console.log(joinedDurationQuery)
+
+    sqlQuery += `${joinedDurationQuery} `;
+    // console.log(sqlQuery)
+    // console.log('sql query: ', sqlQuery)
+  }
 
   // add to sql statement based on filter options: age
   if (age) {
@@ -118,13 +158,13 @@ export async function getGamesByFilter(
     // console.log(ageQuery)
     let joinedAgeQuery = ageQuery.join(" OR ")
     if ( difficulty || number_of_players || duration || genre) {
-      
+
       joinedAgeQuery= joinedAgeQuery+')';
     }
   
     // console.log(joinedAgeQuery)
 
-    // sqlParams.push(age)
+
     sqlQuery += `${joinedAgeQuery} `;
     // console.log(sqlQuery)
     // console.log('sql query: ', sqlQuery)
