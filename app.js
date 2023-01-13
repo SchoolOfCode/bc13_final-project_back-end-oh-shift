@@ -15,7 +15,7 @@ app.use(function (req, res, next) {
   res.status(404).json({
     success: false,
     error:
-        "We couldn't find what you were looking for 😞. Did you send the request to the right path?"
+        "We couldn't find what you were looking for 😞😞. Did you send the request to the right path?"
   })
 })
 
