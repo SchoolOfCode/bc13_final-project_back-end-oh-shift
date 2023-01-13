@@ -4,7 +4,7 @@ import cors from 'cors'
 import { gamesRouter } from './routes/games.js'
 const app = express()
 
-app.use(cors())
+app.use(cors('*'))
 app.use(morgan('dev'))
 app.use(express.json())
 app.use('/api/games', gamesRouter)
