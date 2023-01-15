@@ -27,7 +27,7 @@ gamesRouter.get('/', async function (req, res) {
 
 gamesRouter.get('/:id', async function (req, res) {
   const id = req.params.id
-  const game = await gamesRouter.getByID(id)
+  const game = await gamesModel.getByID(id)
   res.status(200).json({
     success: true,
     payload: game

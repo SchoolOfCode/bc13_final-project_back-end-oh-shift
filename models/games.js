@@ -253,7 +253,7 @@ export async function getByFilter(difficulty,
 }
 
 
-export async function getByID (id) {
+export async function getByID(id) {
   const data = await pool.query(
     'SELECT * FROM games WHERE id = $1',
     [id]
