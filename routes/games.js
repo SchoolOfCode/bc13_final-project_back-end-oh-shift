@@ -18,9 +18,19 @@ gamesRouter.get('/', async function (req, res) {
   const genre = req.query.genre
   const age = req.query.age
 
-  const games = await gamesModel.createQuery(difficulty, number_of_players, age, duration, genre)
+  const games = await gamesModel.getByFilter(difficulty, number_of_players, age, duration, genre) 
   res.status(200).json({
     success: true,
     payload: games
   })
+})
+
+gamesRouter.get('/:id', async function (req, res) {
+  const id = req.params.id
+  const game = await gamesRouter.getByID(id)
+  res.status(200).json({
+    success: true,
+    payload: game
+  })
+
 })
