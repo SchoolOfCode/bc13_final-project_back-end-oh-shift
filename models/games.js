@@ -203,12 +203,14 @@ export async function createGame(newGame) {
 
 
 ///elijah's version
-export async function createQuery(difficulty,
+
+export async function getByFilter(difficulty,
   number_of_players,
   age,
   duration,
   genre) {
 
+    console.log('createQuery running')
   const sqlParams = [];
   let sqlQuery = "SELECT * FROM games";
   
@@ -251,4 +253,10 @@ export async function createQuery(difficulty,
 }
 
 
-
+export async function getByID(id) {
+  const data = await pool.query(
+    'SELECT * FROM games WHERE id = $1',
+    [id]
+  )
+  return data.rows[0]
+}
