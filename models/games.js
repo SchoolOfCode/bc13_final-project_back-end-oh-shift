@@ -1,5 +1,6 @@
 import { pool } from "../db/index.js";
 
+/**Dev Ex- add games to database query */
 export async function createGame(newGame) {
   const data = await pool.query(
     "INSERT INTO games (title, year_published, quantity, minimum_players, maximum_players, genre, duration, difficulty, minimum_age, description, packaging_image_url, artwork_image_url, rules, barcode, location, video_rules) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING *;",
@@ -25,6 +26,7 @@ export async function createGame(newGame) {
   return data.rows[0];
 }
 
+/** Advanced filtering- more customisable filtering models */
 // export async function getGamesByFilter(
 //   difficulty,
 //   number_of_players,
@@ -89,7 +91,6 @@ export async function createGame(newGame) {
 //     userDuration.push(duration)
 //     console.log('userDuration', userDuration)
 
-
 //     for (let i = 0; i <= duration.length; i++) {
 //       if (duration[i] == '30' || userDuration[i] == '30') {
 //         sqlParams.push(30);
@@ -114,7 +115,7 @@ export async function createGame(newGame) {
 
 //     console.log('duration query', durationQuery)
 //     let joinedDurationQuery = durationQuery.join(" OR ")
-  
+
 //     console.log(joinedDurationQuery)
 
 //     sqlQuery += `${joinedDurationQuery} `;
@@ -133,7 +134,6 @@ export async function createGame(newGame) {
 //     userAge.push(age)
 //     console.log('userAge', userAge, userAge.length)
 //     console.log('age', age, age.length)
-  
 
 //     for (let i = 0; i < age.length; i++) {
 //       if (age[i] == '10' || userAge[i] == '10') {
@@ -169,11 +169,9 @@ export async function createGame(newGame) {
 //     if ( paramCount[paramCount.indexOf('age')+1]) {
 //       joinedAgeQuery= joinedAgeQuery+')';
 //     }
-  
 
 //     sqlQuery += `${joinedAgeQuery} `;
 //     console.log('joinedAgeQuery', joinedAgeQuery)
-
 
 //   }
 
@@ -189,74 +187,74 @@ export async function createGame(newGame) {
 //     sqlQuery= sqlQuery+'))'
 //   }
 
-
 //   console.log(sqlParams);
 //   console.log(sqlQuery);
-  
 
 //   const result = await pool.query(sqlQuery, sqlParams);
 //   const games = result.rows;
 //   return games;
 // }
 
-
-
-
 ///elijah's version
 
-export async function getByFilter(difficulty,
+export async function getByFilter(
+  difficulty,
   number_of_players,
   age,
   duration,
-  genre) {
-
-    console.log('createQuery running')
+  genre
+) {
+  console.log("createQuery running");
   const sqlParams = [];
   let sqlQuery = "SELECT * FROM games";
-  
+
   if (difficulty) {
-    (sqlParams.length > 0) ? sqlQuery += ' AND' : sqlQuery += ' WHERE'
-    ;
+    sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
     sqlParams.push(difficulty);
     sqlQuery += ` difficulty = $${sqlParams.length}`;
   }
 
   if (number_of_players) {
-    (sqlParams.length > 0) ? sqlQuery += ' AND' : sqlQuery += ' WHERE'
+    sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
     sqlParams.push(number_of_players);
     sqlQuery += ` minimum_players <= $${sqlParams.length} AND maximum_players >= $${sqlParams.length}`;
   }
 
   if (age) {
-    (sqlParams.length > 0) ? sqlQuery += ' AND' : sqlQuery += ' WHERE'
+    sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
     sqlParams.push(age);
     sqlQuery += ` minimum_age <= $${sqlParams.length}`;
   }
 
   if (duration) {
-    (sqlParams.length > 0) ? sqlQuery += ' AND' : sqlQuery += ' WHERE'
+    sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
     sqlParams.push(duration);
-    sqlQuery += ` duration <= $${sqlParams.length}`
+    sqlQuery += ` duration <= $${sqlParams.length}`;
   }
 
   if (genre) {
-    (sqlParams.length > 0) ? sqlQuery += ' AND' : sqlQuery += ' WHERE'
+    sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
     sqlParams.push(genre);
-    sqlQuery += ` $${sqlParams.length} = ANY(genre)`
+    sqlQuery += ` $${sqlParams.length} = ANY(genre)`;
   }
 
-  sqlQuery += ';'
-  console.log(sqlQuery, sqlParams)
+  sqlQuery += ";";
+  console.log(sqlQuery, sqlParams);
   const result = await pool.query(sqlQuery, sqlParams);
   const games = result.rows;
   return games;
 }
 
-
 export async function getByID(id) {
-  const data = await pool.query(
-    'SELECT * FROM games WHERE id = $1',
-    [id]
-  )
-  return data.rows[0]
+  const data = await pool.query("SELECT * FROM games WHERE id = $1", [id]);
+  return data.rows[0];
 }
+
+/**Function to select distinct options from filter categories (dropdown values in filter component)- reuseable for all filter categories  */
+export async function filterHandler(category) {
+  const data = await pool.query(`SELECT DISTINCT ${category} FROM games;`);
+  //const options = data.rows;
+  const options = data;
+  return options;
+}
+// Thing to consider: avoiding SQL injection/ formatting to be more secure path
