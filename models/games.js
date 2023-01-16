@@ -1,5 +1,6 @@
 import { pool } from "../db/index.js";
 
+/**Dev Ex- add games to database query */
 export async function createGame(newGame) {
   const data = await pool.query(
     "INSERT INTO games (title, year_published, quantity, minimum_players, maximum_players, genre, duration, difficulty, minimum_age, description, packaging_image_url, artwork_image_url, rules, barcode, location, video_rules) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING *;",
@@ -25,238 +26,88 @@ export async function createGame(newGame) {
   return data.rows[0];
 }
 
-// export async function getGamesByFilter(
-//   difficulty,
-//   number_of_players,
-//   age,
-//   duration,
-//   genre
-// ) {
-//   // specify base of sql statement
-//   let paramCount = []
-//   if (difficulty) {paramCount.push('difficulty')}
-//   if (number_of_players) {paramCount.push('minimum_players')}
-//   if (genre)     paramCount.push('genre');
-//   if (duration) {paramCount.push('duration')}
-//   if (age) {paramCount.push('age')}
 
-//   const sqlParams = [];
-//   let sqlQuery = "SELECT * FROM games ";
+//**Filters games by difficulty, number of players, age, duration and genre paramaters
 
-//   // check to see if any filter criteria is present in url request, if so, add 'where' to sql statement
-//   if (difficulty || number_of_players || age || duration || genre) {
-//     sqlQuery += "WHERE ";
-//     // console.log('sql query: ', sqlQuery)
-//   }
-
-//   // add to sql statement based on filter options: difficulty
-//   if (difficulty) {
-//     sqlParams.push(difficulty);
-//     sqlQuery += `difficulty = $${sqlParams.indexOf(difficulty) + 1}`;
-//     console.log('paramcount index: ', paramCount[paramCount.indexOf('difficulty')+1])
-//     if (paramCount[paramCount.indexOf('difficulty')+1]) {
-//       sqlQuery += ` AND ${paramCount[paramCount.indexOf('difficulty')+1]} IN (SELECT ${paramCount[paramCount.indexOf('difficulty')+1]} FROM games WHERE `;
-//     }
-//   }
-
-//   // add to sql statement based on filter options: number_of_players
-//   if (number_of_players) {
-//     sqlParams.push(number_of_players);
-//     sqlQuery += `maximum_players >= $${
-//       sqlParams.indexOf(number_of_players) + 1
-//     } AND minimum_players <= $${sqlParams.indexOf(number_of_players) + 1}`;
-//     console.log('paramcount index: ', paramCount[paramCount.indexOf('minimum_players')+1])
-//         if (paramCount[paramCount.indexOf('minimum_players')+1]) {
-//       sqlQuery += ` AND ${paramCount[paramCount.indexOf('minimum_players')+1]} IN (SELECT ${paramCount[paramCount.indexOf('minimum_players')+1]} FROM games WHERE `;
-//     }
-//   }
-
-//   // add to sql statement based on filter options: genre
-//   if (genre) {
-//     sqlParams.push(genre);
-//     sqlQuery += `$${sqlParams.indexOf(genre) + 1} = ANY(genre) `;
-//     console.log('paramcount index: ', paramCount[paramCount.indexOf('genre')+1])
-//         if (paramCount[paramCount.indexOf('genre')+1]) {
-//       sqlQuery += ` AND ${paramCount[paramCount.indexOf('genre')+1]} IN (SELECT ${paramCount[paramCount.indexOf('genre')+1]} FROM games WHERE `;
-//     }
-//   }
-
-//   // add to sql statement based on filter options: duration
-//   if (duration) {
-//     console.log('DURATION =', duration)
-//     let durationQuery = [];
-//     let userDuration = [];
-//     userDuration.push(duration)
-//     console.log('userDuration', userDuration)
-
-
-//     for (let i = 0; i <= duration.length; i++) {
-//       if (duration[i] == '30' || userDuration[i] == '30') {
-//         sqlParams.push(30);
-//         durationQuery.push(`duration <= $${sqlParams.indexOf(30) + 1}`);
-//       }
-//       if (duration[i] == '60' || userDuration[i] == '60') {
-//         sqlParams.push(29, 89);
-//         durationQuery.push(`duration BETWEEN $${sqlParams.indexOf(29) + 1} AND $${sqlParams.indexOf(89) + 1}`);
-//       }
-//       if (duration[i] == '90' || userDuration[i] == '90') {
-//         sqlParams.push(90);
-//         durationQuery.push(`duration >= $${sqlParams.indexOf(90) + 1}`);
-//       }
-
-//       if (duration[i] == 'any'  || userDuration[i] == 'any') {
-//         sqlParams.push(0);
-//         durationQuery.push(
-//           `duration > $${sqlParams.indexOf(0) + 1}`
-//         );
-//       }
-//     }
-
-//     console.log('duration query', durationQuery)
-//     let joinedDurationQuery = durationQuery.join(" OR ")
-  
-//     console.log(joinedDurationQuery)
-
-//     sqlQuery += `${joinedDurationQuery} `;
-//     console.log('paramcount index: ', paramCount[paramCount.indexOf('duration')+1])
-
-//     if ( paramCount[paramCount.indexOf('duration')+1] ) {
-//       sqlQuery += ` AND ${paramCount[paramCount.indexOf('duration')+1]}  IN (SELECT ${paramCount[paramCount.indexOf('duration')+1]}  FROM games WHERE `;
-//     }
-//   }
-
-//   // add to sql statement based on filter options: age
-//   if (age) {
-//     console.log('AGE = ', age)
-//     let ageQuery = [];
-//     let userAge = [];
-//     userAge.push(age)
-//     console.log('userAge', userAge, userAge.length)
-//     console.log('age', age, age.length)
-  
-
-//     for (let i = 0; i < age.length; i++) {
-//       if (age[i] == '10' || userAge[i] == '10') {
-//         sqlParams.push(10);
-//         ageQuery.push(`minimum_age <= $${sqlParams.indexOf(10) + 1}`);
-//       }
-//       if (age[i] == '12' || userAge[i] == '12') {
-//         sqlParams.push(10, 12);
-//         ageQuery.push(`minimum_age BETWEEN $${sqlParams.indexOf(10) + 1} AND $${sqlParams.indexOf(12) + 1}`
-//         );
-//       }
-//       if (age[i] == '17' || userAge[i] == '17') {
-//         sqlParams.push(13, 17);
-//         ageQuery.push(`minimum_age BETWEEN $${sqlParams.indexOf(13) + 1} AND $${sqlParams.indexOf(17) + 1}`
-//         );
-//       }
-//       if (age[i] == '18' || userAge[i] == '18') {
-//         sqlParams.push(18);
-//         ageQuery.push(`minimum_age >= $${sqlParams.indexOf(18) + 1}`);
-//       }
-//       if (age[i] == 'any' || userAge[i] == 'any') {
-//         sqlParams.push(1);
-//         ageQuery.push(
-//           `minimum_age > $${sqlParams.indexOf(1) + 1}`
-//         );
-//       }
-//     }
-
-//     console.log('ageQuery', ageQuery)
-//     let joinedAgeQuery = ageQuery.join(" OR ")
-
-//     console.log('paramcount index: ', paramCount[paramCount.indexOf('age')+1])
-//     if ( paramCount[paramCount.indexOf('age')+1]) {
-//       joinedAgeQuery= joinedAgeQuery+')';
-//     }
-  
-
-//     sqlQuery += `${joinedAgeQuery} `;
-//     console.log('joinedAgeQuery', joinedAgeQuery)
-
-
-//   }
-
-//   console.log('param count', paramCount)
-//   // console.log(joinedAgeQuery)
-//   if (paramCount.length === 5) {
-//     sqlQuery= sqlQuery+'))))';
-//   }
-//   if (paramCount.length === 4) {
-//     sqlQuery= sqlQuery+')))';
-//   }
-//   if (paramCount.length === 3) {
-//     sqlQuery= sqlQuery+'))'
-//   }
-
-
-//   console.log(sqlParams);
-//   console.log(sqlQuery);
-  
-
-//   const result = await pool.query(sqlQuery, sqlParams);
-//   const games = result.rows;
-//   return games;
-// }
-
-
-
-
-///elijah's version
-
-export async function getByFilter(difficulty,
+export async function getByFilter(
+  difficulty,
   number_of_players,
   age,
   duration,
-  genre) {
-
-    console.log('createQuery running')
+  genre
+) {
+  console.log("createQuery running");
   const sqlParams = [];
   let sqlQuery = "SELECT * FROM games";
-  
+
   if (difficulty) {
-    (sqlParams.length > 0) ? sqlQuery += ' AND' : sqlQuery += ' WHERE'
-    ;
+    sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
     sqlParams.push(difficulty);
     sqlQuery += ` difficulty = $${sqlParams.length}`;
   }
 
   if (number_of_players) {
-    (sqlParams.length > 0) ? sqlQuery += ' AND' : sqlQuery += ' WHERE'
+    sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
     sqlParams.push(number_of_players);
     sqlQuery += ` minimum_players <= $${sqlParams.length} AND maximum_players >= $${sqlParams.length}`;
   }
 
   if (age) {
-    (sqlParams.length > 0) ? sqlQuery += ' AND' : sqlQuery += ' WHERE'
+    sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
     sqlParams.push(age);
     sqlQuery += ` minimum_age <= $${sqlParams.length}`;
   }
 
   if (duration) {
-    (sqlParams.length > 0) ? sqlQuery += ' AND' : sqlQuery += ' WHERE'
+    sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
     sqlParams.push(duration);
-    sqlQuery += ` duration <= $${sqlParams.length}`
+    sqlQuery += ` duration <= $${sqlParams.length}`;
   }
 
   if (genre) {
-    (sqlParams.length > 0) ? sqlQuery += ' AND' : sqlQuery += ' WHERE'
+    sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
     sqlParams.push(genre);
-    sqlQuery += ` $${sqlParams.length} = ANY(genre)`
+    sqlQuery += ` $${sqlParams.length} = ANY(genre)`;
   }
 
-  sqlQuery += ';'
-  console.log(sqlQuery, sqlParams)
+  sqlQuery += ";";
+  console.log(sqlQuery, sqlParams);
   const result = await pool.query(sqlQuery, sqlParams);
   const games = result.rows;
   return games;
 }
 
-
 export async function getByID(id) {
-  const data = await pool.query(
-    'SELECT * FROM games WHERE id = $1',
-    [id]
-  )
-  return data.rows[0]
+  const data = await pool.query("SELECT * FROM games WHERE id = $1", [id]);
+  return data.rows[0];
 }
+
+/**Function to select distinct options from filter categories (dropdown values in filter component)- reuseable for all filter categories  */
+export async function genreFilterHandler() {
+  const data = await pool.query(`SELECT DISTINCT unnest(genre) FROM games ORDER BY UNNEST(genre) ASC;`);
+  const options = data.rows;
+  return options;
+}
+// Thing to consider: avoiding SQL injection/ formatting to be more secure path
+
+/**Function to select distinct DIFFICULTY options from filter categories (dropdown values in filter component)-   */
+export async function difficultyFilterHandler() {
+  const data = await pool.query(`SELECT DISTINCT difficulty FROM games WHERE difficulty IN (
+    SELECT difficulty from games
+    ORDER BY case
+    WHEN difficulty = 'easy' THEN 1
+    WHEN difficulty = 'intermediate' THEN 2
+    WHEN difficulty = 'hard' THEN 3
+    END);`);
+  const options = data.rows;
+  return options;
+}
+// Thing to consider: avoiding SQL injection/ formatting to be more secure path
+
+/**Function to select distinct DURATION options from filter categories (dropdown values in filter component)-   */
+export async function durationFilterHandler() {
+  const data = await pool.query(`SELECT DISTINCT duration FROM games ORDER BY duration ASC;`);
+  const options = data.rows;
+  return options;
+}
+// Thing to consider: avoiding SQL injection/ formatting to be more secure path
