@@ -42,10 +42,10 @@ gamesRouter.get("/:id", async function (req, res) {
   });
 });
 
-/**Route- ability to search/ access a data response with filter options applied
+/**Route- ability to search/ access a data response for GENRE options
  * Options = same as result of fetch via this route
  */
-gamesRouter.get("/filters/:category", async function (req, res) {
+gamesRouter.get("/genre", async function (req, res) {
   const category = req.params.category;
   console.log(category);
   const options = await gamesModel.filterHandler(category);
@@ -53,4 +53,37 @@ gamesRouter.get("/filters/:category", async function (req, res) {
     success: true,
     payload: options,
   });
+});
+
+/**Route- ability to search/ access a data response with filter options applied
+ * Options = same as result of fetch via this route
+ */
+gamesRouter.get("/filters/:category", async function (req, res) {
+  const category = req.params.category;
+  console.log(category);
+
+  if (category == 'genre') {
+    const options = await gamesModel.genreFilterHandler()
+    return res.status(200).json({
+      success: true,
+      payload: options,
+    });
+  } if (category == 'difficulty') {
+  const options = await gamesModel.difficultyFilterHandler();
+  return res.status(200).json({
+    success: true,
+    payload: options,
+  });
+} if (category == 'duration') {
+  const options = await gamesModel.durationFilterHandler();
+  return res.status(200).json({
+    success: true,
+    payload: options,
+  });
+} else {
+  return res.status(401).json({
+    success: false.value,
+    payload: 'Filter options for this category are not available'
+  })
+}
 });

@@ -251,10 +251,31 @@ export async function getByID(id) {
 }
 
 /**Function to select distinct options from filter categories (dropdown values in filter component)- reuseable for all filter categories  */
-export async function filterHandler(category) {
-  const data = await pool.query(`SELECT DISTINCT ${category} FROM games;`);
-  //const options = data.rows;
-  const options = data;
+export async function genreFilterHandler() {
+  const data = await pool.query(`SELECT DISTINCT unnest(genre) FROM games ORDER BY UNNEST(genre) ASC;`);
+  const options = data.rows;
+  return options;
+}
+// Thing to consider: avoiding SQL injection/ formatting to be more secure path
+
+/**Function to select distinct DIFFICULTY options from filter categories (dropdown values in filter component)-   */
+export async function difficultyFilterHandler() {
+  const data = await pool.query(`SELECT DISTINCT difficulty FROM games WHERE difficulty IN (
+    SELECT difficulty from games
+    ORDER BY case
+    WHEN difficulty = 'easy' THEN 1
+    WHEN difficulty = 'intermediate' THEN 2
+    WHEN difficulty = 'hard' THEN 3
+    END);`);
+  const options = data.rows;
+  return options;
+}
+// Thing to consider: avoiding SQL injection/ formatting to be more secure path
+
+/**Function to select distinct DURATION options from filter categories (dropdown values in filter component)-   */
+export async function durationFilterHandler() {
+  const data = await pool.query(`SELECT DISTINCT duration FROM games ORDER BY duration ASC;`);
+  const options = data.rows;
   return options;
 }
 // Thing to consider: avoiding SQL injection/ formatting to be more secure path
