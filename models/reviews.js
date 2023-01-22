@@ -23,7 +23,6 @@ export async function getByGameId(gameId) {
   return data.rows;
 }
 
-/* Add average rating here */
 
 /* deletes specific review by id */
 export async function deleteReview (reviewId) {
