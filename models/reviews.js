@@ -17,7 +17,7 @@ export async function createReview(newReview) {
 
 export async function getByGameId(gameId) {
   const data = await pool.query(
-    "SELECT review_id, reviews.date_added, game_id, review_text,rating, user_given_name, user_picture, user_id, title, (SELECT AVG(rating) FROM reviews WHERE game_id=$1)::numeric(10, 2) as average_rating FROM reviews JOIN games ON reviews.game_id= games.id WHERE games.id=$1 ORDER BY reviews.date_added DESC;",
+    "SELECT review_id, reviews.date_added, game_id, review_text,rating, user_given_name, user_picture, user_id, title, (SELECT AVG(rating) FROM reviews WHERE game_id=$1)::numeric(10, 1) as average_rating FROM reviews JOIN games ON reviews.game_id= games.id WHERE games.id=$1 ORDER BY reviews.date_added DESC;",
     [gameId]
   );
   return data.rows;
