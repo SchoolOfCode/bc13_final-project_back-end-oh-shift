@@ -17,3 +17,10 @@ reviewsRouter.get("/:gameId", async function (req, res) {
   const reviews = await reviewsModel.getByGameId(gameId);
   res.status(200).json({ success: true, payload: reviews });
 });
+
+/*delete specific review by id */
+reviewsRouter.delete("/:id", async function (req, res) {
+  const reviewId = req.params.id;
+  const result = await reviewsModel.deleteReview(reviewId);
+  res.status(200).json({sucess: true, payload: {message: 'Review deleted!', deletedReview: result }})
+})

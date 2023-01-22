@@ -23,3 +23,12 @@ export async function getByGameId(gameId) {
 }
 
 /* Add average rating here */
+
+/* deletes specific review by id */
+export async function deleteReview (reviewId) {
+  const data = await pool.query(
+    'DELETE FROM reviews WHERE review_id = $1 RETURNING *;',
+    [reviewId]
+  )
+  return data.rows[0]
+}``
