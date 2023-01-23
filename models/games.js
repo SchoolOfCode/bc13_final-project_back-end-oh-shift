@@ -26,7 +26,6 @@ export async function createGame(newGame) {
   return data.rows[0];
 }
 
-
 //**Filters games by difficulty, number of players, age, duration and genre paramaters
 
 export async function getByFilter(
@@ -34,7 +33,9 @@ export async function getByFilter(
   number_of_players,
   age,
   duration,
-  genre
+  genre,
+  sort_by,
+  year_published
 ) {
   console.log("createQuery running");
   const sqlParams = [];
@@ -69,6 +70,18 @@ export async function getByFilter(
     sqlParams.push(genre);
     sqlQuery += ` $${sqlParams.length} = ANY(genre)`;
   }
+  if (sort_by == "az") {
+    sqlQuery += ` ORDER BY title ASC`;
+  }
+  if (sort_by == "za") {
+    sqlQuery += ` ORDER BY title DESC`;
+  }
+  if (sort_by == "new") {
+    sqlQuery += ` ORDER BY year_published DESC`;
+  }
+  if (sort_by == "old") {
+    sqlQuery += ` ORDER BY year_published ASC`;
+  }
 
   sqlQuery += ";";
   console.log(sqlQuery, sqlParams);
@@ -84,7 +97,9 @@ export async function getByID(id) {
 
 /**Function to select distinct options from filter categories (dropdown values in filter component)- reuseable for all filter categories  */
 export async function genreFilterHandler() {
-  const data = await pool.query(`SELECT DISTINCT unnest(genre) FROM games ORDER BY UNNEST(genre) ASC;`);
+  const data = await pool.query(
+    `SELECT DISTINCT unnest(genre) FROM games ORDER BY UNNEST(genre) ASC;`
+  );
   const options = data.rows;
   return options;
 }
@@ -92,7 +107,8 @@ export async function genreFilterHandler() {
 
 /**Function to select distinct DIFFICULTY options from filter categories (dropdown values in filter component)-   */
 export async function difficultyFilterHandler() {
-  const data = await pool.query(`SELECT DISTINCT difficulty FROM games WHERE difficulty IN (
+  const data =
+    await pool.query(`SELECT DISTINCT difficulty FROM games WHERE difficulty IN (
     SELECT difficulty from games
     ORDER BY case
     WHEN difficulty = 'easy' THEN 1
@@ -106,7 +122,9 @@ export async function difficultyFilterHandler() {
 
 /**Function to select distinct DURATION options from filter categories (dropdown values in filter component)-   */
 export async function durationFilterHandler() {
-  const data = await pool.query(`SELECT DISTINCT duration FROM games ORDER BY duration ASC;`);
+  const data = await pool.query(
+    `SELECT DISTINCT duration FROM games ORDER BY duration ASC;`
+  );
   const options = data.rows;
   return options;
 }
