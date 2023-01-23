@@ -17,6 +17,7 @@ gamesRouter.get("/", async function (req, res) {
   const number_of_players = req.query.number_of_players;
   const duration = req.query.duration;
   const genre = req.query.genre;
+  const rating = req.query.rating;
   const age = req.query.age;
   const sort_by = req.query.sort_by;
   const title = req.query.title;
@@ -27,6 +28,7 @@ gamesRouter.get("/", async function (req, res) {
     age,
     duration,
     genre,
+    rating,
     sort_by,
     title
   );

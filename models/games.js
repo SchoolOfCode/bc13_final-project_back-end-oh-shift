@@ -38,10 +38,9 @@ export async function getByFilter(
   age,
   duration,
   genre,
+  rating,
   sort_by,
   title
-
-
 ) {
   console.log("createQuery running");
   const sqlParams = [];
@@ -84,6 +83,11 @@ export async function getByFilter(
   }
   
   sqlQuery += " group by id, title, year_published, games.date_added, quantity, minimum_players, maximum_players, genre, duration, difficulty, minimum_age, description, packaging_image_url, artwork_image_url, rules, barcode, location, video_rules";
+
+  if (rating && rating !== 'all') {
+    sqlParams.push(rating);
+    sqlQuery += ` HAVING AVG(rating) >= $${sqlParams.length} AND AVG(rating) < ${(+rating) + 1}`;
+  }
 
   if (sort_by == "az") {
     sqlQuery += ` ORDER BY title ASC`;
