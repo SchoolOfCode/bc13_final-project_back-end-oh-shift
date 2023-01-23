@@ -76,6 +76,12 @@ export async function getByFilter(
     sqlParams.push(genre);
     sqlQuery += ` $${sqlParams.length} = ANY(genre)`;
   }
+
+  if (title) {
+    sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
+    sqlParams.push(`%${title}%`);
+    sqlQuery += ` title ILIKE $${sqlParams.length}`;
+  }
   
   if (sort_by == "az") {
     sqlQuery += ` ORDER BY title ASC`;
@@ -92,10 +98,9 @@ export async function getByFilter(
   if (sort_by == "old") {
     sqlQuery += ` ORDER BY year_published ASC`;
   }
-  if (title) {
-    sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
-    sqlParams.push(`%${title}%`);
-    sqlQuery += ` title ILIKE $${sqlParams.length}`;
+
+  if (sort_by == "rating") {
+    sqlQuery += ` ORDER BY average_rating ASC`;
   }
 
   sqlQuery += " group by id, title, year_published, games.date_added, quantity, minimum_players, maximum_players, genre, duration, difficulty, minimum_age, description, packaging_image_url, artwork_image_url, rules, barcode, location, video_rules;";
