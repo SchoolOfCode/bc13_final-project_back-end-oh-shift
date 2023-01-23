@@ -18,13 +18,15 @@ gamesRouter.get("/", async function (req, res) {
   const duration = req.query.duration;
   const genre = req.query.genre;
   const age = req.query.age;
+  const sort_by = req.query.sort_by
 
   const games = await gamesModel.getByFilter(
     difficulty,
     number_of_players,
     age,
     duration,
-    genre
+    genre,
+    sort_by
   );
   res.status(200).json({
     success: true,
