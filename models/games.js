@@ -40,6 +40,7 @@ export async function getByFilter(
   genre,
   sort_by,
   title
+
 ) {
   console.log("createQuery running");
   const sqlParams = [];
