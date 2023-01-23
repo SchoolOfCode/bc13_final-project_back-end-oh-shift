@@ -97,9 +97,9 @@ export async function getByID(id) {
 
 /**Function to select distinct options from filter categories (dropdown values in filter component)- reuseable for all filter categories  */
 export async function genreFilterHandler() {
-  const data = await pool.query(
-    `SELECT DISTINCT unnest(genre) FROM games ORDER BY UNNEST(genre) ASC;`
-  );
+
+  const data = await pool.query(`SELECT DISTINCT unnest(genre) as genre FROM games ORDER BY UNNEST(genre) ASC;`);
+
   const options = data.rows;
   return options;
 }
