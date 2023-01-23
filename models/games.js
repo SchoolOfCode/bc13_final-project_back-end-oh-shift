@@ -35,7 +35,6 @@ export async function getByFilter(
   duration,
   genre,
   sort_by,
-  year_published
 ) {
   console.log("createQuery running");
   const sqlParams = [];
