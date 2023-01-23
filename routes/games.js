@@ -18,7 +18,8 @@ gamesRouter.get("/", async function (req, res) {
   const duration = req.query.duration;
   const genre = req.query.genre;
   const age = req.query.age;
-  const sort_by = req.query.sort_by
+  const sort_by = req.query.sort_by;
+  const title = req.query.title;
 
   const games = await gamesModel.getByFilter(
     difficulty,
@@ -26,7 +27,8 @@ gamesRouter.get("/", async function (req, res) {
     age,
     duration,
     genre,
-    sort_by
+    sort_by,
+    title
   );
   res.status(200).json({
     success: true,
@@ -64,28 +66,41 @@ gamesRouter.get("/filters/:category", async function (req, res) {
   const category = req.params.category;
   console.log(category);
 
-  if (category == 'genre') {
-    const options = await gamesModel.genreFilterHandler()
+  if (category == "genre") {
+    const options = await gamesModel.genreFilterHandler();
     return res.status(200).json({
       success: true,
       payload: options,
     });
-  } if (category == 'difficulty') {
-  const options = await gamesModel.difficultyFilterHandler();
-  return res.status(200).json({
-    success: true,
-    payload: options,
-  });
-} if (category == 'duration') {
-  const options = await gamesModel.durationFilterHandler();
-  return res.status(200).json({
-    success: true,
-    payload: options,
-  });
-} else {
-  return res.status(401).json({
-    success: false.value,
-    payload: 'Filter options for this category are not available'
-  })
-}
+  }
+  if (category == "difficulty") {
+    const options = await gamesModel.difficultyFilterHandler();
+    return res.status(200).json({
+      success: true,
+      payload: options,
+    });
+  }
+  if (category == "duration") {
+    const options = await gamesModel.durationFilterHandler();
+    return res.status(200).json({
+      success: true,
+      payload: options,
+    });
+  } else {
+    return res.status(401).json({
+      success: false.value,
+      payload: "Filter options for this category are not available",
+    });
+  }
 });
+
+/**Search bar- get by title route  */
+
+// gamesRouter.get("/", async function (req, res) {
+//   const title = req.params.title;
+//   const game = await gamesModel.getByID(id);
+//   res.status(200).json({
+//     success: true,
+//     payload: game,
+//   });
+// });
