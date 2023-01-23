@@ -26,7 +26,11 @@ export async function createGame(newGame) {
   return data.rows[0];
 }
 
-//**Filters games by difficulty, number of players, age, duration and genre paramaters
+/** Ultimate Filter
+ * Defaults as SELECT all from games
+ * Filepaths take in variables from request and builds out SQL query based on category values
+ * moves through if statements and adds values to SQL query and query syntax if a value is detected
+ */
 
 export async function getByFilter(
   difficulty,
@@ -35,6 +39,8 @@ export async function getByFilter(
   duration,
   genre,
   sort_by,
+  title
+
 ) {
   console.log("createQuery running");
   const sqlParams = [];
@@ -81,6 +87,11 @@ export async function getByFilter(
   if (sort_by == "old") {
     sqlQuery += ` ORDER BY year_published ASC`;
   }
+  if (title) {
+    sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
+    sqlParams.push(`%${title}%`);
+    sqlQuery += ` title ILIKE $${sqlParams.length}`;
+  }
 
   sqlQuery += ";";
   console.log(sqlQuery, sqlParams);
@@ -96,8 +107,9 @@ export async function getByID(id) {
 
 /**Function to select distinct options from filter categories (dropdown values in filter component)- reuseable for all filter categories  */
 export async function genreFilterHandler() {
-
-  const data = await pool.query(`SELECT DISTINCT unnest(genre) as genre FROM games ORDER BY UNNEST(genre) ASC;`);
+  const data = await pool.query(
+    `SELECT DISTINCT unnest(genre) as genre FROM games ORDER BY UNNEST(genre) ASC;`
+  );
 
   const options = data.rows;
   return options;
