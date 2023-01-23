@@ -41,6 +41,7 @@ export async function getByFilter(
   sort_by,
   title
 
+
 ) {
   console.log("createQuery running");
   const sqlParams = [];
@@ -75,15 +76,19 @@ export async function getByFilter(
     sqlParams.push(genre);
     sqlQuery += ` $${sqlParams.length} = ANY(genre)`;
   }
+  
   if (sort_by == "az") {
     sqlQuery += ` ORDER BY title ASC`;
   }
+  
   if (sort_by == "za") {
     sqlQuery += ` ORDER BY title DESC`;
   }
+  
   if (sort_by == "new") {
     sqlQuery += ` ORDER BY year_published DESC`;
   }
+  
   if (sort_by == "old") {
     sqlQuery += ` ORDER BY year_published ASC`;
   }
