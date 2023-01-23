@@ -102,7 +102,7 @@ export async function getByFilter(
   }
 
   if (sort_by == "rating") {
-    sqlQuery += ` ORDER BY average_rating ASC`;
+    sqlQuery += ` ORDER BY average_rating DESC`;
   }
 
   sqlQuery += ";";
