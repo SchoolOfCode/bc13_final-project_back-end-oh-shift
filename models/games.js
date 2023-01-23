@@ -45,7 +45,7 @@ export async function getByFilter(
 ) {
   console.log("createQuery running");
   const sqlParams = [];
-  let sqlQuery = "SELECT * FROM games";
+  let sqlQuery = "select id, title, year_published, games.date_added quantity, minimum_players, maximum_players, genre, duration, difficulty, minimum_age, description, packaging_image_url, artwork_image_url, rules, barcode, location, video_rules, AVG(rating) AS average_rating FROM games INNER JOIN reviews ON games.id = reviews.game_id";
 
   if (difficulty) {
     sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
@@ -98,7 +98,7 @@ export async function getByFilter(
     sqlQuery += ` title ILIKE $${sqlParams.length}`;
   }
 
-  sqlQuery += ";";
+  sqlQuery += " group by id, title, year_published, games.date_added, quantity, minimum_players, maximum_players, genre, duration, difficulty, minimum_age, description, packaging_image_url, artwork_image_url, rules, barcode, location, video_rules;";
   console.log(sqlQuery, sqlParams);
   const result = await pool.query(sqlQuery, sqlParams);
   const games = result.rows;
