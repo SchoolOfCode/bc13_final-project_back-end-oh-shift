@@ -83,6 +83,8 @@ export async function getByFilter(
     sqlQuery += ` title ILIKE $${sqlParams.length}`;
   }
   
+  sqlQuery += " group by id, title, year_published, games.date_added, quantity, minimum_players, maximum_players, genre, duration, difficulty, minimum_age, description, packaging_image_url, artwork_image_url, rules, barcode, location, video_rules";
+
   if (sort_by == "az") {
     sqlQuery += ` ORDER BY title ASC`;
   }
@@ -103,7 +105,7 @@ export async function getByFilter(
     sqlQuery += ` ORDER BY average_rating ASC`;
   }
 
-  sqlQuery += " group by id, title, year_published, games.date_added, quantity, minimum_players, maximum_players, genre, duration, difficulty, minimum_age, description, packaging_image_url, artwork_image_url, rules, barcode, location, video_rules;";
+  sqlQuery += ";";
   console.log(sqlQuery, sqlParams);
   const result = await pool.query(sqlQuery, sqlParams);
   const games = result.rows;
