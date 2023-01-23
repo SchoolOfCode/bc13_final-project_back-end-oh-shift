@@ -93,14 +93,3 @@ gamesRouter.get("/filters/:category", async function (req, res) {
     });
   }
 });
-
-/**Search bar- get by title route  */
-
-// gamesRouter.get("/", async function (req, res) {
-//   const title = req.params.title;
-//   const game = await gamesModel.getByID(id);
-//   res.status(200).json({
-//     success: true,
-//     payload: game,
-//   });
-// });
