@@ -1,6 +1,10 @@
 import { pool } from "../db/index.js";
 
-/**Dev Ex- add games to database query */
+/**
+ * Function that sends an 'INSERT INTO...' SQL statement to the database, populating a row with all object data provided from POST route
+ * @param {*} newGame - an object with title, year_published, quantity, minimum_players, maximum_players, genre, duration, difficulty, mininmum_age, description, packaging_image_url, artwork_image_url, rules, barcode, location and video_rules
+ * @returns new game object added to database via SQL query
+ */
 export async function createGame(newGame) {
   const data = await pool.query(
     "INSERT INTO games (title, year_published, quantity, minimum_players, maximum_players, genre, duration, difficulty, minimum_age, description, packaging_image_url, artwork_image_url, rules, barcode, location, video_rules) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING *;",
@@ -26,10 +30,18 @@ export async function createGame(newGame) {
   return data.rows[0];
 }
 
-/** Ultimate Filter
- * Defaults as SELECT all from games
- * Filepaths take in variables from request and builds out SQL query based on category values
- * moves through if statements and adds values to SQL query and query syntax if a value is detected
+/**
+ * Function takes in variables from request parameters and builds out SQL query based on category values, returning all games in database that match provided filter options. If filter parameters are provided, these are passed to the 'WHERE' values in the SQL statement. If any or all filter parameters are ommited, this function will return all games in database as the SQL query defaults as SELECT all from games.
+ * SQL query is built as function moves through if statements and adds values to SQL query and query syntax if a value is detected
+ * @param {*} difficulty 
+ * @param {*} number_of_players 
+ * @param {*} age 
+ * @param {*} duration 
+ * @param {*} genre 
+ * @param {*} rating 
+ * @param {*} sort_by 
+ * @param {*} title 
+ * @returns object with array of game objects that match the SQL query criteria
  */
 
 export async function getByFilter(
@@ -38,14 +50,13 @@ export async function getByFilter(
   age,
   duration,
   genre,
+  rating,
   sort_by,
   title
-
-
 ) {
-  console.log("createQuery running");
+  console.log("🤖 getByFilter function running");
   const sqlParams = [];
-  let sqlQuery = "SELECT * FROM games";
+  let sqlQuery = "select id, title, year_published, games.date_added quantity, minimum_players, maximum_players, genre, duration, difficulty, minimum_age, description, packaging_image_url, artwork_image_url, rules, barcode, location, video_rules, AVG(rating) AS average_rating FROM games INNER JOIN reviews ON games.id = reviews.game_id";
 
   if (difficulty) {
     sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
@@ -76,7 +87,20 @@ export async function getByFilter(
     sqlParams.push(genre);
     sqlQuery += ` $${sqlParams.length} = ANY(genre)`;
   }
+
+  if (title) {
+    sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
+    sqlParams.push(`%${title}%`);
+    sqlQuery += ` title ILIKE $${sqlParams.length}`;
+  }
   
+  sqlQuery += " group by id, title, year_published, games.date_added, quantity, minimum_players, maximum_players, genre, duration, difficulty, minimum_age, description, packaging_image_url, artwork_image_url, rules, barcode, location, video_rules";
+
+  if (rating && rating !== 'all') {
+    sqlParams.push(rating);
+    sqlQuery += ` HAVING AVG(rating) >= $${sqlParams.length} AND AVG(rating) < ${(+rating) + 1}`;
+  }
+
   if (sort_by == "az") {
     sqlQuery += ` ORDER BY title ASC`;
   }
@@ -92,25 +116,33 @@ export async function getByFilter(
   if (sort_by == "old") {
     sqlQuery += ` ORDER BY year_published ASC`;
   }
-  if (title) {
-    sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
-    sqlParams.push(`%${title}%`);
-    sqlQuery += ` title ILIKE $${sqlParams.length}`;
+
+  if (sort_by == "rating") {
+    sqlQuery += ` ORDER BY average_rating DESC`;
   }
 
   sqlQuery += ";";
-  console.log(sqlQuery, sqlParams);
+  console.log('❓ sqlQuery:', sqlQuery, 'sqlParams:', sqlParams);
   const result = await pool.query(sqlQuery, sqlParams);
   const games = result.rows;
   return games;
 }
 
+/**
+ * Function that returns specific game by game id ('id' column in 'games' table of SQL database)
+ * @param {*} id - id of game
+ * @returns game object where id = id parameter
+ */
 export async function getByID(id) {
   const data = await pool.query("SELECT * FROM games WHERE id = $1", [id]);
   return data.rows[0];
 }
 
-/**Function to select distinct options from filter categories (dropdown values in filter component)- reuseable for all filter categories  */
+/**
+ * Function to select distinct options to populate select drop-down options for front-end genre filter component.
+ * Searches through all games in database and returns unique genre values in alphabetical order
+ * @returns array of genres in key pair value format e.g. [{genre: adventure}, {genre: puzzle}] 
+ */
 export async function genreFilterHandler() {
   const data = await pool.query(
     `SELECT DISTINCT unnest(genre) as genre FROM games ORDER BY UNNEST(genre) ASC;`
@@ -119,9 +151,12 @@ export async function genreFilterHandler() {
   const options = data.rows;
   return options;
 }
-// Thing to consider: avoiding SQL injection/ formatting to be more secure path
 
-/**Function to select distinct DIFFICULTY options from filter categories (dropdown values in filter component)-   */
+/**
+ * Function to select distinct options to populate select drop-down options for front-end difficulty filter component.
+ * Searches through all games in database and returns unique difficulty values in 'easy>intermediate>hard' order
+ * @returns array of difficulty in key pair value format e.g. [{difficulty: easy}, {difficulty: hard}] 
+ */
 export async function difficultyFilterHandler() {
   const data =
     await pool.query(`SELECT DISTINCT difficulty FROM games WHERE difficulty IN (
@@ -134,9 +169,12 @@ export async function difficultyFilterHandler() {
   const options = data.rows;
   return options;
 }
-// Thing to consider: avoiding SQL injection/ formatting to be more secure path
 
-/**Function to select distinct DURATION options from filter categories (dropdown values in filter component)-   */
+/**
+ * Function to select distinct options to populate select drop-down options for front-end duration filter component.
+ * Searches through all games in database and returns unique duration values in order from smallest to largest
+ * @returns array of difficulty in key pair value format e.g. [{duration: 30}, {duration: 60}, {duration: 120}] 
+ */
 export async function durationFilterHandler() {
   const data = await pool.query(
     `SELECT DISTINCT duration FROM games ORDER BY duration ASC;`
@@ -144,4 +182,3 @@ export async function durationFilterHandler() {
   const options = data.rows;
   return options;
 }
-// Thing to consider: avoiding SQL injection/ formatting to be more secure path
