@@ -11,10 +11,11 @@ export const gamesRouter = express.Router();
  * Returns status code, success boolean and payload(confirmation of newGame)
  */
 gamesRouter.post("/", async function (req, res) {
-  console.log(req.body);
-  const newGame = req.body;
-  const result = await gamesModel.createGame(newGame);
-  res.status(201).json({ success: true, payload: result });
+  if (req.body.title) {  console.log(req.body);
+    const newGame = req.body;
+    const result = await gamesModel.createGame(newGame);
+    res.status(201).json({ success: true, payload: result });
+  }
 });
 
 // 🤖 GET getByFilter

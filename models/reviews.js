@@ -1,5 +1,10 @@
 import { pool } from "../db/index.js";
 
+/**
+ * Function to add a review to reviews table of database
+ * @param {*} newReview - object with game_id, review_text, rating, user_given_name, user_picture, user_id
+ * @returns 
+ */
 export async function createReview(newReview) {
   const data = await pool.query(
     "INSERT INTO reviews (game_id, review_text, rating, user_given_name, user_picture, user_id) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;",
