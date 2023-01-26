@@ -125,6 +125,15 @@ export async function getByFilter(
   console.log('❓ sqlQuery:', sqlQuery, 'sqlParams:', sqlParams);
   const result = await pool.query(sqlQuery, sqlParams);
   const games = result.rows;
+
+  games.map((game, index)=>{
+    if (game.average_rating==null) {
+      console.log(games[index].average_rating)
+      games[index].average_rating='0'
+      console.log(games[index].average_rating)
+    }
+  })
+
   return games;
 }
 
