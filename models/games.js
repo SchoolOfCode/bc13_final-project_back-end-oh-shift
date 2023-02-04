@@ -56,7 +56,7 @@ export async function getByFilter(
 ) {
   console.log("🤖 getByFilter function running");
   const sqlParams = [];
-  let sqlQuery = "select id, title, year_published, games.date_added quantity, minimum_players, maximum_players, genre, duration, difficulty, minimum_age, description, packaging_image_url, artwork_image_url, rules, barcode, location, video_rules, AVG(rating) AS average_rating FROM games LEFT JOIN reviews ON games.id = reviews.game_id";
+  let sqlQuery = "select id, title, year_published, games.date_added, quantity, minimum_players, maximum_players, genre, duration, difficulty, minimum_age, description, packaging_image_url, artwork_image_url, rules, barcode, location, video_rules, AVG(rating) AS average_rating FROM games LEFT JOIN reviews ON games.id = reviews.game_id";
 
   if (difficulty) {
     sqlParams.length > 0 ? (sqlQuery += " AND") : (sqlQuery += " WHERE");
